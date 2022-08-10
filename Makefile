@@ -1,11 +1,10 @@
 all: build run
 
 build:
-	mkdir build
-	clang++ src/main.cpp -o build/largo-game
+	mkdir build && cd build && conan install .. && cmake .. && cmake --build . && cd ..
 
 run: build
-	build/largo-game
+	build/bin/largo_game
 
-clean: build
+clean:
 	rm -rf build
