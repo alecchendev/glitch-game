@@ -6,5 +6,8 @@ build:
 run: build
 	build/bin/largo_game
 
+rebuild:
+	cd build && cmake .. && cmake --build . && cd ..
+
 clean:
 	rm -rf build
