@@ -9,5 +9,7 @@ run: build
 rebuild:
 	cd build && cmake .. && cmake --build . && cd ..
 
+dev: rebuild run
+
 clean:
 	rm -rf build
