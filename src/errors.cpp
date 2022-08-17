@@ -13,3 +13,8 @@ class CompileShaderFailed : public std::exception {
 	public:
 		char* what() { return "Failed shader compilation."; }
 };
+
+class LinkShaderProgramFailed : public std::exception {
+	public:
+		char* what() { return "Failed linking shader program."; }
+};
