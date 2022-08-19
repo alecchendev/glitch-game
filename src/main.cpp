@@ -39,7 +39,7 @@ int main() {
 	checkGlad();
 
 	// create shader program object
-	Shader shader_program("src/shaders/shader.vs", "src/shaders/shader.fs");
+	Shader shader_program("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
 
 	// vertex data
 	// -----------
