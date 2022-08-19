@@ -9,6 +9,7 @@
 // Src dependencies
 #include "errors.cpp"
 #include "window.cpp"
+#include "shader.h"
 
 void processInput(GLFWwindow* window)
 {
@@ -25,45 +26,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void checkCompileShader(unsigned int shader) {
-	int  success;
-	char infoLog[512];
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::SHADER_NUM=" << shader << "::COMPILATION_FAILED\n" << infoLog << std::endl;
-		throw CompileShaderFailed();
-	}
-}
-
-void checkLinkShaderProgram(unsigned int shader_program) {
-	int success;
-	char info_log[512];
-	glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shader_program, 512, NULL, info_log);
-		std::cout << "ERROR::SHADER_PROGRAM::PROGRAM_NUM=" << shader_program << "::LINKING_FAILED\n" << info_log << std::endl;
-		throw LinkShaderProgramFailed();
-	}
-}
-
-const char* vertex_shader_src =
-"#version 330 core \
-layout (location = 0) in vec3 aPos; \
-void main() \
-{ \
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0); \
-}";
-
-const char* fragment_shader_src =
-"#version 330 core \
-out vec4 FragColor; \
-void main() \
-{ \
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f); \
-}";
-
 // ENTRYPOINT
 
 int main() {
@@ -76,53 +38,21 @@ int main() {
 	// check glad location
 	checkGlad();
 
-
-	// building shader programs
-	// ------------------------
-	// vertex shader
-	unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	unsigned int n_vshader_src = 1;
-	glShaderSource(vertex_shader, n_vshader_src, &vertex_shader_src, NULL);
-	glCompileShader(vertex_shader);
-	checkCompileShader(vertex_shader);
-
-	// fragment shader
-	unsigned int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	unsigned int n_fshader_src = 1;
-	glShaderSource(fragment_shader, n_fshader_src, &fragment_shader_src, NULL);
-	glCompileShader(fragment_shader);
-	checkCompileShader(fragment_shader);
-
-	// create shader program
-	unsigned int shader_program = glCreateProgram();
-
-	// attach shaders
-	glAttachShader(shader_program, vertex_shader);
-	glAttachShader(shader_program, fragment_shader);
-	// delete shaders
-	glDeleteShader(vertex_shader);
-	glDeleteShader(fragment_shader);
-
-	// link program
-	glLinkProgram(shader_program);
-	checkLinkShaderProgram(shader_program);
-
-	// use program
-	glUseProgram(shader_program);
-
-
+	// create shader program object
+	Shader shader_program("src/shaders/shader.vs", "src/shaders/shader.fs");
 
 	// vertex data
 	// -----------
 	float vertices[] = {
-		0.5f,  0.5f, 0.0f,  // top right
-		0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left 
-	};
+		// positions         // colors
+		0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+		0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+	};  
 	unsigned int indices[] = {  // note that we start from 0!
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
+		// 0, 1, 3,   // first triangle
+		0, 1, 2,   // first triangle
+		// 1, 2, 3    // second triangle
 	};
 
 	// Vertex Array Objects (VAO)
@@ -145,16 +75,16 @@ int main() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// specify how to interpret vertex data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-	// enable vertex atrribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	// Unbind VAO
 	glBindVertexArray(0);
 
 	// uncomment this call to draw in wireframe polygons.
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// Running
 	while (!glfwWindowShouldClose(window))
@@ -169,10 +99,11 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// render triangle
-		glUseProgram(shader_program);
+		// glUseProgram(shader_program);
+		shader_program.use();
 		glBindVertexArray(VAO);
 		// glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -182,7 +113,7 @@ int main() {
 
 	glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shader_program);
+    // glDeleteProgram(shader_program);
 
 	// terminate
 	glfwTerminate();
