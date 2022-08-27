@@ -8,9 +8,9 @@ Current ideas:
     - One of my goals with this is to play more with lower level programming and make something beautiful. The field of programming art is a totally unexplored terrain for me and I think it'd be a lot of fun and a lot of learning to make a game *worth* exploring. To make something like this, I imagine it will force me to operate under some constraints I haven't dealt with much in programming for school, work, and other side projects.
 
 Next to do:
-- Implement camera perspective
-- Refactor graphics engine stuff
-- Implement movement
-- Implement lighting
-- Ground/collisions with bullet
-- Refactor project structure with more conventional package management
+- [x] Implement camera perspective
+- [x] Implement movement
+- [ ] Refactor graphics engine stuff
+- [ ] Implement lighting
+- [ ] Ground/collisions with bullet
+- [ ] Refactor project structure with more conventional package management
