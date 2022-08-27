@@ -9,7 +9,8 @@ Current ideas:
 
 Next to do:
 - Implement camera perspective
+- Refactor graphics engine stuff
 - Implement movement
 - Implement lighting
 - Ground/collisions with bullet
-- Redo project structure with 
+- Refactor project structure with more conventional package management

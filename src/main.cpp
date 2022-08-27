@@ -62,6 +62,7 @@ int main() {
 		1, 2, 3    // second triangle
 	};
 
+
 	// Vertex Array Objects (VAO)
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
@@ -145,8 +146,9 @@ int main() {
 	stbi_image_free(data);
 
 
-	// Set uniforms for shader
+	// Set uniforms
 	shader_program.use(); // don't forget to activate the shader before setting uniforms!  
+	// Set uniforms for texture
 	glUniform1i(glGetUniformLocation(shader_program.ID, "texture1"), 0); // set it manually
 	shader_program.setInt("texture2", 1); // or with shader class
 
@@ -162,23 +164,28 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// render triangle
-		// glUseProgram(shader_program);
-
+		// Textures
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 
-		glm::mat4 trans = glm::mat4(1.0f);
-		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		// Coordinate system
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); 
+		glm::mat4 view = glm::mat4(1.0f);
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
+		glm::mat4 projection;
+		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
 		shader_program.use();
 
-		unsigned int transformLoc = glGetUniformLocation(shader_program.ID, "transform");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+		// Set uniforms for perspective
+		glUniformMatrix4fv(glGetUniformLocation(shader_program.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(shader_program.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(shader_program.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+		// Get vertices and draw
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -191,6 +198,7 @@ int main() {
 	glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     // glDeleteProgram(shader_program);
+	shader_program.deactivate();
 
 	// terminate
 	glfwTerminate();
