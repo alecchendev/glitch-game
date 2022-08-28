@@ -7,7 +7,7 @@ run: build
 	build/main
 
 build:
-	cmake -S . -B build cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/Users/alecchen/Developer/vcpkg/scripts/buildsystems/vcpkg.cmake
+	cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=/Users/alecchen/Developer/vcpkg/scripts/buildsystems/vcpkg.cmake
 	cmake --build build
 
 clean:
