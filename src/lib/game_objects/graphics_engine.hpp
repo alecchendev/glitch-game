@@ -5,6 +5,7 @@ class GraphicsEngine {
   public:
 
   private:
+    GLFWwindow* window;
     Camera camera;
 
 };

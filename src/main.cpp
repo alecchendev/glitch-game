@@ -14,10 +14,10 @@
 #include "stb_image.h"
 
 // Src dependencies
-#include "lib/errors.cpp"
-#include "lib/window.cpp"
-#include "lib/shader.h"
-#include "lib/camera.h"
+#include "lib/utils/errors.cpp"
+#include "lib/utils/window.cpp"
+#include "lib/utils/shader.h"
+#include "lib/game_objects/camera.hpp"
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = 400;
