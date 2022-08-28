@@ -2,8 +2,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "game.hpp"
-#include "graphics_engine.hpp"
+#include "../game/game.hpp"
+#include "../graphics/graphics_engine.hpp"
 
 // Overarching game context that connects input processing to game logic to rendering graphics
 class Context {
@@ -59,11 +59,18 @@ void Context::run() {
 	while (!glfwWindowShouldClose(window_)) {
         // Process input
         processInput();
+
         // Step game
+
         // Render graphics
+
+		// draw background
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// draw elements
+
+		// step to next frame
 		glfwSwapBuffers(window_);
 		glfwPollEvents();
     }

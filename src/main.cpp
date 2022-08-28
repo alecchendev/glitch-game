@@ -1,5 +1,5 @@
 
-#include "lib/game_objects/context.hpp"
+#include "lib/context/context.hpp"
 
 int main() {
 	Context::ContextInit init = {
