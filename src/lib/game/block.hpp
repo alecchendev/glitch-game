@@ -6,6 +6,8 @@
 // Class representing the basic element of an environment
 class Block {
   public:
+    Block(glm::vec3 position, glm::vec3 size): position_(position), size_(size) {}
+
     glm::vec3 position() {
       return position_;
     }

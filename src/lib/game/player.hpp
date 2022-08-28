@@ -8,6 +8,9 @@
 // Class that stores and modifies data related to the player
 class Player {
   public:
+    Player(glm::vec3 direction, glm::vec3 position):
+      direction_(direction), position_(position), size_(glm::vec3(1.0f, 1.0f, 1.0f)) {}
+
     glm::vec3 position() {
       return position_;
     }
@@ -27,7 +30,7 @@ class Player {
   private:
     glm::vec3 direction_;
     glm::vec3 position_;
-    glm::vec3 size_;
+    const glm::vec3 size_;
 
 };
 

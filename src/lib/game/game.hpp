@@ -12,14 +12,17 @@ enum GameState {
 // Class that handles all game logic
 class Game {
   public:
-    Game() {};
+    Game(World first_world):
+      game_state_(Play),
+      player_(Player(first_world.startPosition(), first_world.startDirection())),
+      world_(first_world) {}
 
-    void run();
+    void run() {}
 
   private:
-    GameState game_state;
-    Player player;
-    World world;
+    GameState game_state_;
+    Player player_;
+    World world_;
 };
 
 #endif

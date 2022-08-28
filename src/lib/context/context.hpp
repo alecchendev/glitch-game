@@ -1,3 +1,5 @@
+#ifndef CONTEXT_H
+#define CONTEXT_H
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -12,6 +14,7 @@ class Context {
         int screen_width;
         int screen_height;
         std::string window_name;
+		World world;
     };
 
     Context(ContextInit& init);
@@ -31,10 +34,9 @@ class Context {
     static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 };
 
-Context::Context(ContextInit& init) {
-
-    graphics_engine_ = GraphicsEngine();
-    game_ = Game();
+Context::Context(ContextInit& init):
+	game_(Game(init.world)),
+	graphics_engine_(GraphicsEngine()) {
 
     // Setup window
 	window_ = createWindow(init.screen_width, init.screen_height, init.window_name);
@@ -131,3 +133,5 @@ void Context::checkGlad() {
         stop();
 	}
 }
+
+#endif
