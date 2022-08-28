@@ -130,6 +130,5 @@ private:
         }
     }
 };
-#endif
 
-// 
+#endif
