@@ -12,7 +12,7 @@ enum GameState {
 // Class that handles all game logic
 class Game {
   public:
-    Game();
+    Game() {};
 
     void run();
 

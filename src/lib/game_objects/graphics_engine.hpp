@@ -1,8 +1,8 @@
 
-#include "camera.h"
+#include "camera.hpp"
 
 enum CameraMode {
-  Menu,
+  MenuView,
   FirstPerson,
   ThirdPerson
 };

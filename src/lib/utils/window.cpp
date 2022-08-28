@@ -20,7 +20,7 @@ GLFWwindow* createWindow() {
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
-		throw CreateWindowFailed();
+		exit(1);
 	}
 	return window;
 
@@ -30,6 +30,6 @@ void checkGlad() {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
-        throw CheckGladFailed();
+		exit(1);
 	}
 }
