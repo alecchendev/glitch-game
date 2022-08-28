@@ -1,13 +1,13 @@
 all: build run
 
 build:
-	mkdir build && cd build && conan install .. && cmake .. && cmake --build . && cd ..
+	mkdir build && cd build && conan install .. && cd .. && cmake -S . -B build && cmake --build build
 
 run: build
-	build/bin/largo_game
+	build/bin/glitch_game
 
 rebuild:
-	cd build && cmake .. && cmake --build . && cd ..
+	cmake -S . -B build && cmake --build build
 
 dev: rebuild run
 
