@@ -22,7 +22,7 @@ const float SPEED       =  2.5f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  45.0f;
 
-// An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
+// Camera class for representing the location and direction of the user's perspective in-game
 class Camera
 {
   public:
@@ -87,16 +87,6 @@ class Camera
 
         // update Front, Right and Up Vectors using the updated Euler angles
         updateCameraVectors();
-    }
-
-    // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-    void ProcessMouseScroll(float yoffset)
-    {
-        zoom_ -= (float)yoffset;
-        if (zoom_ < 1.0f)
-            zoom_ = 1.0f;
-        if (zoom_ > 45.0f)
-            zoom_ = 45.0f; 
     }
 
   private:

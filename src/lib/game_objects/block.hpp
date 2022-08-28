@@ -1,5 +1,6 @@
 #include <glm/glm.hpp>
 
+// Class representing the basic element of an environment
 class Block {
   public:
     glm::vec3 position() {
@@ -8,10 +9,6 @@ class Block {
 
     glm::vec3 size() {
       return size;
-    }
-
-    void move(glm::vec3 movement) {
-      position += movement;
     }
 
   private:

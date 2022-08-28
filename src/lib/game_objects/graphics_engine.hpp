@@ -1,11 +1,18 @@
 
 #include "camera.h"
 
+enum CameraMode {
+  Menu,
+  FirstPerson,
+  ThirdPerson
+};
+
+// Class that handles the window, moving the camera, drawing objects on screen
 class GraphicsEngine {
   public:
 
   private:
-    GLFWwindow* window;
     Camera camera;
+    CameraMode camera_mode;
 
 };

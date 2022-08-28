@@ -1,14 +1,15 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "world.h"
-#include "player.h"
+#include "world.hpp"
+#include "player.hpp"
 
 enum GameState {
     Menu,
     Play
 };
 
+// Class that handles all game logic
 class Game {
   public:
     Game();
