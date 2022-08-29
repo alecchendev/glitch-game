@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <vector>
+
 #include "world.hpp"
 #include "player.hpp"
 
@@ -18,6 +20,10 @@ class Game {
       world_(first_world) {}
 
     void run() {}
+
+    std::vector<Block> blocks() {
+      return world_.blocks();
+    }
 
   private:
     GameState game_state_;

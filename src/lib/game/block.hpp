@@ -8,11 +8,11 @@ class Block {
   public:
     Block(glm::vec3 position, glm::vec3 size): position_(position), size_(size) {}
 
-    glm::vec3 position() {
+    glm::vec3 position() const {
       return position_;
     }
 
-    glm::vec3 size() {
+    glm::vec3 size() const {
       return size_;
     }
 

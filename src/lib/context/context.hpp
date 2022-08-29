@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <vector>
 #include "../game/game.hpp"
 #include "../graphics/graphics_engine.hpp"
 #include "../graphics/shader.h"
@@ -53,6 +54,10 @@ void Context::run() {
 
 	// Setup world data for graphics
 	graphics_engine_.init();
+	std::vector<Block> blocks = game_.blocks();
+	for (const Block& block : blocks) {
+		graphics_engine_.addBlock(block);
+	}
 
     // Actually run
 	while (!glfwWindowShouldClose(window_)) {
@@ -74,6 +79,8 @@ void Context::run() {
     }
 
     // Delete graphics objects
+	graphics_engine_.freeShader("color");
+	graphics_engine_.freeShader("texture");
 
     glfwTerminate();
 

@@ -28,7 +28,7 @@ class Camera
 
     // constructor with vectors
     Camera(
-        glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3 position = glm::vec3(0.0f, 0.0f, -5.0f),
         glm::vec3 world_up = glm::vec3(0.0f, 1.0f, 0.0f),
         glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f),
         float xz_angle = XZ_ANGLE,
