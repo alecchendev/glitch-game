@@ -4,6 +4,7 @@
 #define SHADER_H
 
 #include <glad/glad.h>
+#include <glm/ext.hpp>
 
 #include <string>
 #include <fstream>

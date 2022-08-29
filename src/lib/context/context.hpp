@@ -6,6 +6,7 @@
 #include <iostream>
 #include "../game/game.hpp"
 #include "../graphics/graphics_engine.hpp"
+#include "../graphics/shader.h"
 
 // Overarching game context that connects input processing to game logic to rendering graphics
 class Context {
@@ -36,8 +37,8 @@ class Context {
 
 Context::Context(ContextInit& init):
 	game_(Game(init.world)),
-	graphics_engine_(GraphicsEngine()) {
-
+	graphics_engine_(GraphicsEngine())
+{
     // Setup window
 	window_ = createWindow(init.screen_width, init.screen_height, init.window_name);
 	glfwMakeContextCurrent(window_);
@@ -46,16 +47,12 @@ Context::Context(ContextInit& init):
 
 void Context::run() {
 
-
     // Setup cursor input
 	glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window_, mouseCallback);
 
-	// Check glad location
-	checkGlad();
-
-	// Enable depth buffer
-	glEnable(GL_DEPTH_TEST);
+	// Setup world data for graphics
+	graphics_engine_.init();
 
     // Actually run
 	while (!glfwWindowShouldClose(window_)) {
@@ -65,12 +62,11 @@ void Context::run() {
         // Step game
 
         // Render graphics
-
 		// draw background
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		graphics_engine_.drawBackground(0.2f, 0.3f, 0.3f, 1.0f);
 
 		// draw elements
+		graphics_engine_.drawElements();
 
 		// step to next frame
 		glfwSwapBuffers(window_);
@@ -126,12 +122,5 @@ void Context::mouseCallback(GLFWwindow* window, double xpos, double ypos) {
 
 }
 
-void Context::checkGlad() {
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-        stop();
-	}
-}
 
 #endif
