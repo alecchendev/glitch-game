@@ -38,17 +38,49 @@ class Block {
     glm::vec3 size_;
 };
 
-// class SolidColorBlock : public Block {
-//   public:
+class SolidColorBlock : public Block {
+  public:
+    SolidColorBlock(glm::vec3 position, glm::vec3 size):
+        Block(position, size)
+    {}
 
-//     std::vector<float> vertices() {
-//         return {};
-//     }
+    std::vector<float> vertices() {
 
-//     std::vector<unsigned int> indices() {
-//         return {};
-//     }
-// }
+        const glm::vec3 size = this->size();
+        return {
+            0.0f,   0.0f,   0.0f,
+            size.x, 0.0f,   0.0f,
+            size.x, size.y, 0.0f,
+            0.0f,   size.y, 0.0f,
+            0.0f,   0.0f,   size.z,
+            size.x, 0.0f,   size.z,
+            size.x, size.y, size.z,
+            0.0f,   size.y, size.z
+        };
+    }
+
+    std::vector<unsigned int> indices() {
+        return {
+            0, 1, 2,
+            2, 3, 0,
+
+            4, 5, 6,
+            6, 7, 4,
+
+            4, 5, 1,
+            1, 0, 4,
+
+            3, 2, 6,
+            6, 7, 3,
+
+            4, 0, 3,
+            3, 7, 4,
+
+            1, 5, 6,
+            6, 2, 1
+        };
+    }
+};
 
 class TextureBlock : public Block {
   public:
@@ -59,45 +91,41 @@ class TextureBlock : public Block {
     std::vector<float> vertices() {
 
         const glm::vec3 size = this->size();
-        const float x_size = size.x / 2;
-        const float y_size = size.y / 2;
-        const float z_size = size.z / 2;
-        const std::vector<float> vertices = {
+        return {
             0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
-            x_size, 0.0f, 0.0f,  1.0f, 0.0f,
-            x_size,  y_size, 0.0f,  1.0f, 1.0f,
-            0.0f,  y_size, 0.0f,  0.0f, 1.0f,
+            size.x, 0.0f, 0.0f,  1.0f, 0.0f,
+            size.x,  size.y, 0.0f,  1.0f, 1.0f,
+            0.0f,  size.y, 0.0f,  0.0f, 1.0f,
 
-            0.0f, 0.0f,  z_size,  0.0f, 0.0f,
-            x_size, 0.0f,  z_size,  1.0f, 0.0f,
-            x_size,  y_size,  z_size,  1.0f, 1.0f,
-            0.0f,  y_size,  z_size,  0.0f, 1.0f,
+            0.0f, 0.0f,  size.z,  0.0f, 0.0f,
+            size.x, 0.0f,  size.z,  1.0f, 0.0f,
+            size.x,  size.y,  size.z,  1.0f, 1.0f,
+            0.0f,  size.y,  size.z,  0.0f, 1.0f,
 
-            0.0f,  y_size,  z_size,  1.0f, 0.0f,
-            0.0f,  y_size, 0.0f,  1.0f, 1.0f,
+            0.0f,  size.y,  size.z,  1.0f, 0.0f,
+            0.0f,  size.y, 0.0f,  1.0f, 1.0f,
             0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
-            0.0f, 0.0f,  z_size,  0.0f, 0.0f,
+            0.0f, 0.0f,  size.z,  0.0f, 0.0f,
 
-            x_size,  y_size,  z_size,  1.0f, 0.0f,
-            x_size,  y_size, 0.0f,  1.0f, 1.0f,
-            x_size, 0.0f, 0.0f,  0.0f, 1.0f,
-            x_size, 0.0f,  z_size,  0.0f, 0.0f,
+            size.x,  size.y,  size.z,  1.0f, 0.0f,
+            size.x,  size.y, 0.0f,  1.0f, 1.0f,
+            size.x, 0.0f, 0.0f,  0.0f, 1.0f,
+            size.x, 0.0f,  size.z,  0.0f, 0.0f,
 
             0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
-            x_size, 0.0f, 0.0f,  1.0f, 1.0f,
-            x_size, 0.0f,  z_size,  1.0f, 0.0f,
-            0.0f, 0.0f,  z_size,  0.0f, 0.0f,
+            size.x, 0.0f, 0.0f,  1.0f, 1.0f,
+            size.x, 0.0f,  size.z,  1.0f, 0.0f,
+            0.0f, 0.0f,  size.z,  0.0f, 0.0f,
 
-            0.0f,  y_size, 0.0f,  0.0f, 1.0f,
-            x_size,  y_size, 0.0f,  1.0f, 1.0f,
-            x_size,  y_size,  z_size,  1.0f, 0.0f,
-            0.0f,  y_size,  z_size,  0.0f, 0.0f,
+            0.0f,  size.y, 0.0f,  0.0f, 1.0f,
+            size.x,  size.y, 0.0f,  1.0f, 1.0f,
+            size.x,  size.y,  size.z,  1.0f, 0.0f,
+            0.0f,  size.y,  size.z,  0.0f, 0.0f,
         };
-        return vertices;
     }
 
     std::vector<unsigned int> indices() {
-        const std::vector<unsigned int> indices = {
+        return {
             0, 1, 2,
             2, 3, 0,
 
@@ -116,7 +144,6 @@ class TextureBlock : public Block {
             20, 21, 22,
             22, 23, 20,
         };
-        return indices;
     }
 };
 
