@@ -10,6 +10,7 @@
 
 #include <glitch/shader.h>
 #include <glitch/camera.h>
+#include <glitch/graphics.h>
 
 #include <iostream>
 
@@ -267,11 +268,11 @@ int main()
         for (unsigned int i = 0; i < 1; i++)
         {
             // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-            model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            ourShader.setMat4("model", model);
+            gfx::Model model = gfx::Model()
+                .translate(cubePositions[i])
+                .rotate(glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            ourShader.setMat4("model", model.mat4());
 
             // glDrawArrays(GL_TRIANGLES, 0, 36);
             glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
