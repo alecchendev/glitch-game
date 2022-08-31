@@ -1,3 +1,4 @@
+// Taken from https://github.com/JoeyDeVries/LearnOpenGL
 #ifndef CAMERA_H
 #define CAMERA_H
 

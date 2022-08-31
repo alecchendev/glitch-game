@@ -126,6 +126,7 @@ class Texture {
 
 };
 
+// Unnecessary class
 class Model {
   public:
 
