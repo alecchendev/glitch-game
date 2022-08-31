@@ -9,6 +9,117 @@
 
 namespace gfx {
 
+const unsigned int N_CUBE_SOLID_COLOR_VERTICES = 8;
+const unsigned int N_CUBE_TEXTURE_VERTICES = 24 * 5; // * length of single vertex data
+const unsigned int N_CUBE_INDICES = 12 * 3; // * 3 xyz coords
+const unsigned int N_CUBE_DRAW_VERTICES = 36;
+
+class Block {
+  public:
+    
+    Block(glm::vec3 position, glm::vec3 size):
+        position_(position),
+        size_(size)
+    {}
+
+    virtual std::vector<float> vertices() = 0;
+    virtual std::vector<unsigned int> indices() = 0;
+
+    glm::vec3 position() const {
+        return position_;
+    }
+
+    glm::vec3 size() const {
+        return size_;
+    }
+
+  private:
+    glm::vec3 position_;
+    glm::vec3 size_;
+};
+
+// class SolidColorBlock : public Block {
+//   public:
+
+//     std::vector<float> vertices() {
+//         return {};
+//     }
+
+//     std::vector<unsigned int> indices() {
+//         return {};
+//     }
+// }
+
+class TextureBlock : public Block {
+  public:
+    TextureBlock(glm::vec3 position, glm::vec3 size):
+        Block(position, size)
+    {}
+
+    std::vector<float> vertices() {
+
+        const glm::vec3 size = this->size();
+        const float x_size = size.x / 2;
+        const float y_size = size.y / 2;
+        const float z_size = size.z / 2;
+        const std::vector<float> vertices = {
+            0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+            x_size, 0.0f, 0.0f,  1.0f, 0.0f,
+            x_size,  y_size, 0.0f,  1.0f, 1.0f,
+            0.0f,  y_size, 0.0f,  0.0f, 1.0f,
+
+            0.0f, 0.0f,  z_size,  0.0f, 0.0f,
+            x_size, 0.0f,  z_size,  1.0f, 0.0f,
+            x_size,  y_size,  z_size,  1.0f, 1.0f,
+            0.0f,  y_size,  z_size,  0.0f, 1.0f,
+
+            0.0f,  y_size,  z_size,  1.0f, 0.0f,
+            0.0f,  y_size, 0.0f,  1.0f, 1.0f,
+            0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+            0.0f, 0.0f,  z_size,  0.0f, 0.0f,
+
+            x_size,  y_size,  z_size,  1.0f, 0.0f,
+            x_size,  y_size, 0.0f,  1.0f, 1.0f,
+            x_size, 0.0f, 0.0f,  0.0f, 1.0f,
+            x_size, 0.0f,  z_size,  0.0f, 0.0f,
+
+            0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+            x_size, 0.0f, 0.0f,  1.0f, 1.0f,
+            x_size, 0.0f,  z_size,  1.0f, 0.0f,
+            0.0f, 0.0f,  z_size,  0.0f, 0.0f,
+
+            0.0f,  y_size, 0.0f,  0.0f, 1.0f,
+            x_size,  y_size, 0.0f,  1.0f, 1.0f,
+            x_size,  y_size,  z_size,  1.0f, 0.0f,
+            0.0f,  y_size,  z_size,  0.0f, 0.0f,
+        };
+        return vertices;
+    }
+
+    std::vector<unsigned int> indices() {
+        const std::vector<unsigned int> indices = {
+            0, 1, 2,
+            2, 3, 0,
+
+            4, 5, 6,
+            6, 7, 4,
+
+            8, 9, 10,
+            10, 11, 8,
+
+            12, 13, 14,
+            14, 15, 12,
+
+            16, 17, 18,
+            18, 19, 16,
+
+            20, 21, 22,
+            22, 23, 20,
+        };
+        return indices;
+    }
+};
+
 class VAO {
 
   public:
