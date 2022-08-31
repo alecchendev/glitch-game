@@ -148,25 +148,12 @@ int main()
         glm::vec3( 0.0f,  0.0f,  0.0f),
     };
 
-    unsigned int VBO, EBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    // create vertex array object
+    gfx::VAO vao;
+    vao.addVertexBuffer(sizeof(vertices), vertices, GL_STATIC_DRAW);
+    vao.addElementBuffer(sizeof(indices), indices, GL_STATIC_DRAW);
+    vao.addVertexAttribute(0, 3, 5, 0); // vertex positions
+    vao.addVertexAttribute(1, 3, 5, 3); // texture coords
 
 
     // load and create a texture 
@@ -236,7 +223,7 @@ int main()
         ourShader.setMat4("view", view);
 
         // render boxes
-        glBindVertexArray(VAO);
+        vao.bind();
         for (unsigned int i = 0; i < 1; i++)
         {
             // calculate the model matrix for each object and pass it to shader before drawing
@@ -246,8 +233,7 @@ int main()
                 .rotate(glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model.mat4());
 
-            // glDrawArrays(GL_TRIANGLES, 0, 36);
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+            vao.drawElements(36);
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -258,8 +244,7 @@ int main()
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    vao.deallocate();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
