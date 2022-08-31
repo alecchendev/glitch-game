@@ -86,7 +86,8 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_PATH.c_str());
+    // Shader ourShader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_PATH.c_str());
+    Shader ourShader(VERTEX_SHADER_PATH.c_str(), "src/shaders/f_color.glsl");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -186,6 +187,7 @@ int main()
     ourShader.use();
     ourShader.setInt("texture1", 0);
     ourShader.setInt("texture2", 1);
+    ourShader.setVec4("color", glm::vec4(1.0f, 0.5f, 0.2f, 1.0f));
 
 
     // render loop
@@ -228,7 +230,7 @@ int main()
         {
             // calculate the model matrix for each object and pass it to shader before drawing
             float angle = 20.0f * i;
-            gfx::Model model = glm::mat4(1.0f);
+            glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
