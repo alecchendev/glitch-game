@@ -23,6 +23,7 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 const char* WINDOW_TITLE = "Glitch Game";
+const glm::vec4 BG_COL = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 // shaders
 const std::string VERTEX_SHADER_PATH = "src/shaders/vertex.glsl";
@@ -206,7 +207,7 @@ int main()
 
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(BG_COL.x, BG_COL.y, BG_COL.z, BG_COL.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
         // bind textures on corresponding texture units
