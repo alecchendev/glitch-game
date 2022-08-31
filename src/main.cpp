@@ -13,6 +13,8 @@
 #include <glitch/graphics.h>
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -23,10 +25,12 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 const char* WINDOW_TITLE = "Glitch Game";
+const glm::vec4 BG_COL = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 // shaders
 const std::string VERTEX_SHADER_PATH = "src/shaders/vertex.glsl";
-const std::string FRAGMENT_SHADER_PATH = "src/shaders/fragment.glsl";
+const std::string FRAGMENT_SHADER_SOLID_COLOR_PATH = "src/shaders/f_color.glsl";
+const std::string FRAGMENT_SHADER_TEXTURE_PATH = "src/shaders/fragment.glsl";
 
 // images/textures
 const std::string AWESOMEFACE_IMAGE_PATH = "src/images/awesomeface.png";
@@ -86,62 +90,74 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_PATH.c_str());
+    // Shader ourShader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_PATH.c_str());
+    Shader ourShader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_TEXTURE_PATH.c_str());
+    Shader solidShader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_SOLID_COLOR_PATH.c_str());
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    // float vertices[] = {
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    //      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    //     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //      0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    //      0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    };
+    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    //     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    // };
 
-    // element indices
-    unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0,
+    // // element indices
+    // unsigned int indices[] = {
+    //     0, 1, 2,
+    //     2, 3, 0,
 
-        4, 5, 6,
-        6, 7, 4,
+    //     4, 5, 6,
+    //     6, 7, 4,
 
-        8, 9, 10,
-        10, 11, 8,
+    //     8, 9, 10,
+    //     10, 11, 8,
 
-        12, 13, 14,
-        14, 15, 12,
+    //     12, 13, 14,
+    //     14, 15, 12,
 
-        16, 17, 18,
-        18, 19, 16,
+    //     16, 17, 18,
+    //     18, 19, 16,
 
-        20, 21, 22,
-        22, 23, 20,
-    };
+    //     20, 21, 22,
+    //     22, 23, 20,
+    // };
+    gfx::TextureBlock sample_cube(
+        glm::vec3(-0.5f, -0.5f, -0.5f),
+        glm::vec3(1.0f, 1.0f, 1.0f)
+    );
+    std::vector<float> vertices_vec = sample_cube.vertices();
+    float vertices[gfx::N_CUBE_TEXTURE_VERTICES];
+    std::copy(vertices_vec.begin(), vertices_vec.end(), vertices);
+    std::vector<unsigned int> indices_vec = sample_cube.indices();
+    unsigned int indices[gfx::N_CUBE_INDICES];
+    std::copy(indices_vec.begin(), indices_vec.end(), indices);
 
     // world space positions of our cubes
     glm::vec3 cubePositions[] = {
@@ -154,6 +170,43 @@ int main()
     vao.addElementBuffer(sizeof(indices), indices, GL_STATIC_DRAW);
     vao.addVertexAttribute(0, 3, 5, 0); // vertex positions
     vao.addVertexAttribute(1, 3, 5, 3); // texture coords
+
+
+    // solid color cube
+    float length = 0.8f;
+    gfx::SolidColorBlock orange_cube(
+        glm::vec3(-2.0f, 0.0f, 0.0f),
+        glm::vec3(length, length, length)
+    );
+
+    // get vertex data
+    std::vector<float> orange_vtx_vec = orange_cube.vertices();
+    float orange_vertices[gfx::N_CUBE_TEXTURE_VERTICES];
+    std::copy(orange_vtx_vec.begin(), orange_vtx_vec.end(), orange_vertices);
+    std::vector<unsigned int> orange_idx_vec = orange_cube.indices();
+    unsigned int orange_indices[gfx::N_CUBE_INDICES];
+    std::copy(orange_idx_vec.begin(), orange_idx_vec.end(), orange_indices);
+
+    // create vao from block
+    gfx::VAO orange_vao;
+    orange_vao.addVertexBuffer(sizeof(orange_vertices), orange_vertices, GL_STATIC_DRAW);
+    orange_vao.addElementBuffer(sizeof(orange_indices), orange_indices, GL_STATIC_DRAW);
+    orange_vao.addVertexAttribute(0, 3, 3, 0); // vertex positions
+
+
+
+
+
+    // create a block, get vertex + index data from block, create vao
+    // float length = 3.0f;
+    // Block ground = Block(
+    //     glm::vec3(-length/2, -length/4, -length/2),
+    //     glm::vec3(length, length/4, length)
+    // );
+    // float ground_vertices[gfx::N_CUBE_SOLID_COLOR_VERTICES * 3];
+    // unsigned int ground_indices[gfx::N_CUBE_INDICES * 3];
+    // ground.fillVertices(ground_vertices);
+    // ground.fillIndices(ground_indices);
 
 
     // load and create a texture 
@@ -187,6 +240,9 @@ int main()
     ourShader.setInt("texture1", 0);
     ourShader.setInt("texture2", 1);
 
+    solidShader.use();
+    solidShader.setVec4("color", glm::vec4(1.0f, 0.5f, 0.2f, 1.0f));
+
 
     // render loop
     // -----------
@@ -204,7 +260,7 @@ int main()
 
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(BG_COL.x, BG_COL.y, BG_COL.z, BG_COL.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
         // bind textures on corresponding texture units
@@ -222,19 +278,22 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("view", view);
 
-        // render boxes
+        // render blocks
         vao.bind();
-        for (unsigned int i = 0; i < 1; i++)
-        {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            float angle = 20.0f * i;
-            gfx::Model model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            ourShader.setMat4("model", model);
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, sample_cube.position());
+        ourShader.setMat4("model", model);
+        vao.drawElements(36);
 
-            vao.drawElements(36);
-        }
+        solidShader.use();
+        solidShader.setMat4("projection", projection);
+        solidShader.setMat4("view", view);
+
+        orange_vao.bind();
+        glm::mat4 orange_model = glm::mat4(1.0f);
+        orange_model = glm::translate(orange_model, orange_cube.position());
+        solidShader.setMat4("model", orange_model);
+        orange_vao.drawElements(36);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
