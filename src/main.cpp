@@ -11,6 +11,7 @@
 #include <glitch/shader.h>
 #include <glitch/camera.h>
 #include <glitch/graphics.h>
+#include <glitch/player.h>
 
 #include <iostream>
 #include <vector>
@@ -41,6 +42,13 @@ Camera camera(glm::vec3(0.0f, 0.5f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
+
+// create player
+Player player(
+    glm::vec3(0.0f, 0.0f, -1.0f),
+    glm::vec3(0.0f, 0.5f, 3.0f),
+    glm::vec3(1.0f, 1.0f, 1.0f)
+);
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -237,13 +245,21 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+        // camera.ProcessKeyboard(FORWARD, deltaTime);
+        player.move(PlayerMovement::Forward, deltaTime);
+        camera.move(player.position());
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        // camera.ProcessKeyboard(BACKWARD, deltaTime);
+        player.move(PlayerMovement::Backward, deltaTime);
+        camera.move(player.position());
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        // camera.ProcessKeyboard(LEFT, deltaTime);
+        player.move(PlayerMovement::Left, deltaTime);
+        camera.move(player.position());
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        // camera.ProcessKeyboard(RIGHT, deltaTime);
+        player.move(PlayerMovement::Right, deltaTime);
+        camera.move(player.position());
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
