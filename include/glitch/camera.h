@@ -71,6 +71,12 @@ public:
         Position = position;
     }
 
+    void setDirection(glm::vec3 front) {
+        Front = front;
+        Up = glm::vec3(0.0f, 1.0f, 0.0f);
+        Right = glm::normalize(glm::cross(Front, Up));
+    }
+
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {

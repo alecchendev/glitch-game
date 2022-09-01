@@ -128,6 +128,33 @@ int main()
     gfx::VAO ground_vao;
     ground_vao.initFromBlock(ground_block);
 
+    // purple
+    float purple_length = 1.0f;
+    gfx::SolidColorBlock purple_block(
+        glm::vec3(0.0f, 0.0f, 10.0f),
+        glm::vec3(purple_length, purple_length, purple_length)
+    );
+    gfx::VAO purple_vao;
+    purple_vao.initFromBlock(purple_block);
+
+    // green
+    float green_length = 1.0f;
+    gfx::SolidColorBlock green_block(
+        glm::vec3(-10.0f, 0.0f, 0.0f),
+        glm::vec3(green_length, green_length, green_length)
+    );
+    gfx::VAO green_vao;
+    green_vao.initFromBlock(green_block);
+
+    // blue
+    float blue_length = 1.0f;
+    gfx::SolidColorBlock blue_block(
+        glm::vec3(10.0f, 0.0f, 0.0f),
+        glm::vec3(blue_length, blue_length, blue_length)
+    );
+    gfx::VAO blue_vao;
+    blue_vao.initFromBlock(blue_block);
+
     // // add blocks to vector to render
     // std::vector<gfx::VAO&> world_objects;
     // world_objects.push_back(orange_vao);
@@ -221,6 +248,27 @@ int main()
         solidShader.setMat4("model", ground_model);
         ground_vao.drawElements(36);
 
+        solidShader.setVec4("color", glm::vec4(0.8f, 0.0f, 0.8f, 1.0f));
+        purple_vao.bind();
+        glm::mat4 purple_model = glm::mat4(1.0f);
+        purple_model = glm::translate(purple_model, purple_block.position());
+        solidShader.setMat4("model", purple_model);
+        purple_vao.drawElements(36);
+
+        solidShader.setVec4("color", glm::vec4(0.0f, 0.8f, 0.5f, 1.0f));
+        green_vao.bind();
+        glm::mat4 green_model = glm::mat4(1.0f);
+        green_model = glm::translate(green_model, green_block.position());
+        solidShader.setMat4("model", green_model);
+        green_vao.drawElements(36);
+
+        solidShader.setVec4("color", glm::vec4(0.0f, 0.2f, 0.8f, 1.0f));
+        blue_vao.bind();
+        glm::mat4 blue_model = glm::mat4(1.0f);
+        blue_model = glm::translate(blue_model, blue_block.position());
+        solidShader.setMat4("model", blue_model);
+        blue_vao.drawElements(36);
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -248,18 +296,22 @@ void processInput(GLFWwindow *window)
         // camera.ProcessKeyboard(FORWARD, deltaTime);
         player.move(PlayerMovement::Forward, deltaTime);
         camera.move(player.position());
+        camera.setDirection(player.front());
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         // camera.ProcessKeyboard(BACKWARD, deltaTime);
         player.move(PlayerMovement::Backward, deltaTime);
         camera.move(player.position());
+        camera.setDirection(player.front());
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         // camera.ProcessKeyboard(LEFT, deltaTime);
         player.move(PlayerMovement::Left, deltaTime);
         camera.move(player.position());
+        camera.setDirection(player.front());
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         // camera.ProcessKeyboard(RIGHT, deltaTime);
         player.move(PlayerMovement::Right, deltaTime);
         camera.move(player.position());
+        camera.setDirection(player.front());
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
