@@ -67,6 +67,13 @@ public:
         return glm::lookAt(Position, Position + Front, Up);
     }
 
+    void followBehind(glm::vec3 position, glm::vec3 front) {
+        Front = glm::normalize(front + glm::vec3(0.0f, -0.5f, 0.0f));
+        Position = position - 5.0f * Front;
+        Up = glm::vec3(0.0f, 1.0f, 0.0f);
+        Right = glm::normalize(glm::cross(Front, Up));
+    }
+
     void move(glm::vec3 position) {
         Position = position;
     }

@@ -25,6 +25,10 @@ class Block {
     virtual std::vector<float> vertices() const = 0;
     virtual std::vector<unsigned int> indices() const = 0;
 
+    void setPosition(glm::vec3 new_position) {
+        position_ = new_position;
+    }
+
     glm::vec3 position() const {
         return position_;
     }

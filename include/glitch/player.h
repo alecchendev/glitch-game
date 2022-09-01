@@ -19,21 +19,25 @@ class Player {
         front_(front), position_(position), hurtbox_size_(hurtbox_size), yaw_(-glm::pi<float>() / 2)
     {}
 
-    glm::vec3 position() {
+    glm::vec3 position() const {
         return position_;
     }
 
-    glm::vec3 front() {
+    glm::vec3 front() const {
         return front_;
     }
 
-    glm::vec3 right() {
+    glm::vec3 right() const {
         const glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
         glm::vec3 right = glm::normalize(glm::cross(front_, up));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         return right;
     }
 
-    glm::vec3 hurtboxSize() {
+    float yaw() const {
+        return yaw_;
+    }
+
+    glm::vec3 hurtboxSize() const {
         return hurtbox_size_;
     }
 
@@ -46,14 +50,13 @@ class Player {
             position_ -= front_ * speed;
         }
         if (movement == PlayerMovement::Left) {
-            // position_ -= right() * speed;
+            position_ -= right() * speed / 2.0f;
             turn(-turn_speed_);
         }
         if (movement == PlayerMovement::Right) {
-            // position_ += right() * speed;
+            position_ += right() * speed / 2.0f;
             turn(turn_speed_);
         }
-        std::cout << front_.x << " " << front_.y << " " << front_.z << std::endl;
     }
 
     void turn(float angle) {
@@ -86,7 +89,7 @@ class Player {
     float yaw_;
     glm::vec3 position_;
     glm::vec3 hurtbox_size_;
-    const float move_speed_ = 2.5f;
+    const float move_speed_ = 3.0f;
     const float turn_speed_ = 0.025f;
 
 };

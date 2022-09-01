@@ -47,7 +47,7 @@ bool firstMouse = true;
 Player player(
     glm::vec3(0.0f, 0.0f, -1.0f),
     glm::vec3(0.0f, 0.5f, 3.0f),
-    glm::vec3(1.0f, 1.0f, 1.0f)
+    glm::vec3(0.7f, 0.7f, 0.7f)
 );
 
 // timing
@@ -103,6 +103,17 @@ int main()
     Shader solidShader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_SOLID_COLOR_PATH.c_str());
 
     // Create blocks
+
+    // player block
+    gfx::TextureBlock player_block(
+        player.position(),
+        player.hurtboxSize()
+    );
+    gfx::VAO player_vao;
+    player_vao.initFromBlock(player_block);
+
+
+    // sample texture block
     gfx::TextureBlock sample_cube(
         glm::vec3(-0.5f, 0.5f, -1.0f),
         glm::vec3(1.0f, 1.0f, 1.0f)
@@ -200,9 +211,10 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // input
-        // -----
+        // input + game logic
+        // ------------------
         processInput(window);
+        player_block.setPosition(player.position());
 
         // render
         // ------
@@ -223,6 +235,14 @@ int main()
         ourShader.use();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
+
+        player_vao.bind();
+        glm::mat4 player_model = glm::mat4(1.0f);
+        player_model = glm::translate(player_model, player_block.position());
+        player_model = glm::rotate(player_model, -player.yaw(), glm::vec3(0.0f, 1.0f, 0.0f));
+        player_model = glm::translate(player_model, - 0.5f * player_block.size());
+        ourShader.setMat4("model", player_model);
+        vao.drawElements(36);
 
         vao.bind();
         glm::mat4 model = glm::mat4(1.0f);
@@ -295,23 +315,19 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         // camera.ProcessKeyboard(FORWARD, deltaTime);
         player.move(PlayerMovement::Forward, deltaTime);
-        camera.move(player.position());
-        camera.setDirection(player.front());
+        camera.followBehind(player.position(), player.front());
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         // camera.ProcessKeyboard(BACKWARD, deltaTime);
         player.move(PlayerMovement::Backward, deltaTime);
-        camera.move(player.position());
-        camera.setDirection(player.front());
+        camera.followBehind(player.position(), player.front());
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         // camera.ProcessKeyboard(LEFT, deltaTime);
         player.move(PlayerMovement::Left, deltaTime);
-        camera.move(player.position());
-        camera.setDirection(player.front());
+        camera.followBehind(player.position(), player.front());
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         // camera.ProcessKeyboard(RIGHT, deltaTime);
         player.move(PlayerMovement::Right, deltaTime);
-        camera.move(player.position());
-        camera.setDirection(player.front());
+        camera.followBehind(player.position(), player.front());
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
