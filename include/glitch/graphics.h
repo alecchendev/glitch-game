@@ -9,7 +9,7 @@
 
 namespace gfx {
 
-const unsigned int N_CUBE_SOLID_COLOR_VERTICES = 8;
+const unsigned int N_CUBE_SOLID_COLOR_VERTICES = 8 * 3;
 const unsigned int N_CUBE_TEXTURE_VERTICES = 24 * 5; // * length of single vertex data
 const unsigned int N_CUBE_INDICES = 12 * 3; // * 3 xyz coords
 const unsigned int N_CUBE_DRAW_VERTICES = 36;
@@ -22,8 +22,8 @@ class Block {
         size_(size)
     {}
 
-    virtual std::vector<float> vertices() = 0;
-    virtual std::vector<unsigned int> indices() = 0;
+    virtual std::vector<float> vertices() const = 0;
+    virtual std::vector<unsigned int> indices() const = 0;
 
     glm::vec3 position() const {
         return position_;
@@ -44,7 +44,7 @@ class SolidColorBlock : public Block {
         Block(position, size)
     {}
 
-    std::vector<float> vertices() {
+    std::vector<float> vertices() const {
 
         const glm::vec3 size = this->size();
         return {
@@ -59,7 +59,7 @@ class SolidColorBlock : public Block {
         };
     }
 
-    std::vector<unsigned int> indices() {
+    std::vector<unsigned int> indices() const {
         return {
             0, 1, 2,
             2, 3, 0,
@@ -88,7 +88,7 @@ class TextureBlock : public Block {
         Block(position, size)
     {}
 
-    std::vector<float> vertices() {
+    std::vector<float> vertices() const {
 
         const glm::vec3 size = this->size();
         return {
@@ -124,7 +124,7 @@ class TextureBlock : public Block {
         };
     }
 
-    std::vector<unsigned int> indices() {
+    std::vector<unsigned int> indices() const {
         return {
             0, 1, 2,
             2, 3, 0,
@@ -154,6 +154,33 @@ class VAO {
     VAO() {
         glGenVertexArrays(1, &addr_);
         glBindVertexArray(addr_);
+    }
+
+    void initFromBlock(const SolidColorBlock& block) {
+        std::vector<float> vtx_vec = block.vertices();
+        float vertices[gfx::N_CUBE_SOLID_COLOR_VERTICES];
+        std::copy(vtx_vec.begin(), vtx_vec.end(), vertices);
+        std::vector<unsigned int> idx_vec = block.indices();
+        unsigned int indices[gfx::N_CUBE_INDICES];
+        std::copy(idx_vec.begin(), idx_vec.end(), indices);
+
+        addVertexBuffer(sizeof(vertices), vertices, GL_STATIC_DRAW);
+        addElementBuffer(sizeof(indices), indices, GL_STATIC_DRAW);
+        addVertexAttribute(0, 3, 3, 0);
+    }
+
+    void initFromBlock(const TextureBlock& block) {
+        std::vector<float> vtx_vec = block.vertices();
+        float vertices[gfx::N_CUBE_TEXTURE_VERTICES];
+        std::copy(vtx_vec.begin(), vtx_vec.end(), vertices);
+        std::vector<unsigned int> idx_vec = block.indices();
+        unsigned int indices[gfx::N_CUBE_INDICES];
+        std::copy(idx_vec.begin(), idx_vec.end(), indices);
+
+        addVertexBuffer(sizeof(vertices), vertices, GL_STATIC_DRAW);
+        addElementBuffer(sizeof(indices), indices, GL_STATIC_DRAW);
+        addVertexAttribute(0, 3, 5, 0);
+        addVertexAttribute(1, 3, 5, 3);
     }
 
     void addVertexBuffer(unsigned int data_size, float vertices[], int draw_type) {

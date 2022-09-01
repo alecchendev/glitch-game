@@ -37,7 +37,7 @@ const std::string AWESOMEFACE_IMAGE_PATH = "src/images/awesomeface.png";
 const std::string CONTAINER_IMAGE_PATH = "src/images/container.jpg";
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.5f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -94,83 +94,13 @@ int main()
     Shader ourShader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_TEXTURE_PATH.c_str());
     Shader solidShader(VERTEX_SHADER_PATH.c_str(), FRAGMENT_SHADER_SOLID_COLOR_PATH.c_str());
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    // float vertices[] = {
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-    //      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    //      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    //     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-
-    //     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //     -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //      0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    //     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    //      0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-    //      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    //     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    //     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    //      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    //      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    //     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    // };
-
-    // // element indices
-    // unsigned int indices[] = {
-    //     0, 1, 2,
-    //     2, 3, 0,
-
-    //     4, 5, 6,
-    //     6, 7, 4,
-
-    //     8, 9, 10,
-    //     10, 11, 8,
-
-    //     12, 13, 14,
-    //     14, 15, 12,
-
-    //     16, 17, 18,
-    //     18, 19, 16,
-
-    //     20, 21, 22,
-    //     22, 23, 20,
-    // };
+    // Create blocks
     gfx::TextureBlock sample_cube(
-        glm::vec3(-0.5f, -0.5f, -0.5f),
+        glm::vec3(-0.5f, 0.5f, -1.0f),
         glm::vec3(1.0f, 1.0f, 1.0f)
     );
-    std::vector<float> vertices_vec = sample_cube.vertices();
-    float vertices[gfx::N_CUBE_TEXTURE_VERTICES];
-    std::copy(vertices_vec.begin(), vertices_vec.end(), vertices);
-    std::vector<unsigned int> indices_vec = sample_cube.indices();
-    unsigned int indices[gfx::N_CUBE_INDICES];
-    std::copy(indices_vec.begin(), indices_vec.end(), indices);
-
-    // world space positions of our cubes
-    glm::vec3 cubePositions[] = {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-    };
-
-    // create vertex array object
     gfx::VAO vao;
-    vao.addVertexBuffer(sizeof(vertices), vertices, GL_STATIC_DRAW);
-    vao.addElementBuffer(sizeof(indices), indices, GL_STATIC_DRAW);
-    vao.addVertexAttribute(0, 3, 5, 0); // vertex positions
-    vao.addVertexAttribute(1, 3, 5, 3); // texture coords
-
+    vao.initFromBlock(sample_cube);
 
     // solid color cube
     float length = 0.8f;
@@ -178,36 +108,21 @@ int main()
         glm::vec3(-2.0f, 0.0f, 0.0f),
         glm::vec3(length, length, length)
     );
-
-    // get vertex data
-    std::vector<float> orange_vtx_vec = orange_cube.vertices();
-    float orange_vertices[gfx::N_CUBE_TEXTURE_VERTICES];
-    std::copy(orange_vtx_vec.begin(), orange_vtx_vec.end(), orange_vertices);
-    std::vector<unsigned int> orange_idx_vec = orange_cube.indices();
-    unsigned int orange_indices[gfx::N_CUBE_INDICES];
-    std::copy(orange_idx_vec.begin(), orange_idx_vec.end(), orange_indices);
-
-    // create vao from block
     gfx::VAO orange_vao;
-    orange_vao.addVertexBuffer(sizeof(orange_vertices), orange_vertices, GL_STATIC_DRAW);
-    orange_vao.addElementBuffer(sizeof(orange_indices), orange_indices, GL_STATIC_DRAW);
-    orange_vao.addVertexAttribute(0, 3, 3, 0); // vertex positions
+    orange_vao.initFromBlock(orange_cube);
 
+    // ground
+    float ground_length = 5.0f;
+    gfx::SolidColorBlock ground_block(
+        glm::vec3(-ground_length/2, -ground_length/5, -ground_length/2),
+        glm::vec3(ground_length, ground_length/5, ground_length)
+    );
+    gfx::VAO ground_vao;
+    ground_vao.initFromBlock(ground_block);
 
-
-
-
-    // create a block, get vertex + index data from block, create vao
-    // float length = 3.0f;
-    // Block ground = Block(
-    //     glm::vec3(-length/2, -length/4, -length/2),
-    //     glm::vec3(length, length/4, length)
-    // );
-    // float ground_vertices[gfx::N_CUBE_SOLID_COLOR_VERTICES * 3];
-    // unsigned int ground_indices[gfx::N_CUBE_INDICES * 3];
-    // ground.fillVertices(ground_vertices);
-    // ground.fillIndices(ground_indices);
-
+    // // add blocks to vector to render
+    // std::vector<gfx::VAO&> world_objects;
+    // world_objects.push_back(orange_vao);
 
     // load and create a texture 
     // -------------------------
@@ -240,10 +155,6 @@ int main()
     ourShader.setInt("texture1", 0);
     ourShader.setInt("texture2", 1);
 
-    solidShader.use();
-    solidShader.setVec4("color", glm::vec4(1.0f, 0.5f, 0.2f, 1.0f));
-
-
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -267,18 +178,17 @@ int main()
         container_tx.activeBindTexture(GL_TEXTURE0);
         awesomeface_tx.activeBindTexture(GL_TEXTURE1);
 
-        // activate shader
-        ourShader.use();
-
         // pass projection matrix to shader (note that in this case it could change every frame)
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        ourShader.setMat4("projection", projection);
 
         // camera/view transformation
         glm::mat4 view = camera.GetViewMatrix();
-        ourShader.setMat4("view", view);
 
         // render blocks
+        ourShader.use();
+        ourShader.setMat4("projection", projection);
+        ourShader.setMat4("view", view);
+
         vao.bind();
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, sample_cube.position());
@@ -289,11 +199,19 @@ int main()
         solidShader.setMat4("projection", projection);
         solidShader.setMat4("view", view);
 
+        solidShader.setVec4("color", glm::vec4(1.0f, 0.5f, 0.2f, 1.0f));
         orange_vao.bind();
         glm::mat4 orange_model = glm::mat4(1.0f);
         orange_model = glm::translate(orange_model, orange_cube.position());
         solidShader.setMat4("model", orange_model);
         orange_vao.drawElements(36);
+
+        solidShader.setVec4("color", glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
+        ground_vao.bind();
+        glm::mat4 ground_model = glm::mat4(1.0f);
+        ground_model = glm::translate(ground_model, ground_block.position());
+        solidShader.setMat4("model", ground_model);
+        ground_vao.drawElements(36);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
