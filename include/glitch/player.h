@@ -43,31 +43,43 @@ class Player {
 
     void move(PlayerMovement movement, float delta_time) {
         float speed = move_speed_ * delta_time;
+        glm::vec3 move_dir = glm::vec3(0.0f);
         if (movement == PlayerMovement::Forward) {
-            position_ += front_ * speed;
+            move_dir += front_;
         }
         if (movement == PlayerMovement::Backward) {
-            position_ -= front_ * speed;
+            move_dir -= front_;
         }
         if (movement == PlayerMovement::Left) {
-            position_ -= right() * speed / 2.0f;
+            move_dir -= right();
         }
         if (movement == PlayerMovement::Right) {
-            position_ += right() * speed / 2.0f;
+            move_dir += right();
         }
+        position_ += glm::normalize(move_dir) * speed;
     }
 
-    void turn(float angle) {
-        // calculate angles
-        const float pitch = 0.0f;
-        yaw_ += angle;
-        // calculate front
+    void turn(float yaw) {
+        float pitch = 0.0f;
         glm::vec3 front;
+        yaw_ = glm::radians(yaw);
         front.x = cos((yaw_)) * cos(glm::radians(pitch));
         front.y = sin(glm::radians(pitch));
         front.z = sin((yaw_)) * cos(glm::radians(pitch));
         front_ = glm::normalize(front);
     }
+
+    // void turn(float angle) {
+    //     // calculate angles
+    //     const float pitch = 0.0f;
+    //     yaw_ += angle;
+    //     // calculate front
+    //     glm::vec3 front;
+    //     front.x = cos((yaw_)) * cos(glm::radians(pitch));
+    //     front.y = sin(glm::radians(pitch));
+    //     front.z = sin((yaw_)) * cos(glm::radians(pitch));
+    //     front_ = glm::normalize(front);
+    // }
 
   private:
     glm::vec3 front_;

@@ -67,8 +67,7 @@ public:
         return glm::lookAt(Position, Position + Front, Up);
     }
 
-    void followFront(glm::vec3 position, glm::vec3 front) {
-        Front = front;
+    void followFront(glm::vec3 position) {
         Position = position;
     }
 

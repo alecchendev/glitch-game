@@ -20,6 +20,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow *window);
 
 // settings
@@ -36,6 +37,13 @@ const std::string FRAGMENT_SHADER_TEXTURE_PATH = "src/shaders/fragment.glsl";
 // images/textures
 const std::string AWESOMEFACE_IMAGE_PATH = "src/images/awesomeface.png";
 const std::string CONTAINER_IMAGE_PATH = "src/images/container.jpg";
+
+// camera mode
+enum class CameraMode {
+    FirstPerson,
+    ThirdPerson
+};
+CameraMode camera_mode = CameraMode::ThirdPerson;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.5f, 3.0f));
@@ -80,6 +88,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -236,24 +245,30 @@ int main()
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
-        player_vao.bind();
-        glm::mat4 player_model = glm::mat4(1.0f);
-        player_model = glm::translate(player_model, player_block.position());
-        player_model = glm::rotate(player_model, -player.yaw(), glm::vec3(0.0f, 1.0f, 0.0f));
-        player_model = glm::translate(player_model, - 0.5f * player_block.size());
-        ourShader.setMat4("model", player_model);
-        vao.drawElements(36);
+        // don't draw player if in first person mode
+        if (camera_mode == CameraMode::ThirdPerson) {
+            player_vao.bind();
+            glm::mat4 player_model = glm::mat4(1.0f);
+            player_model = glm::translate(player_model, player_block.position());
+            player_model = glm::rotate(player_model, -player.yaw(), glm::vec3(0.0f, 1.0f, 0.0f));
+            player_model = glm::translate(player_model, - 0.5f * player_block.size());
+            ourShader.setMat4("model", player_model);
+            vao.drawElements(36);
+        }
 
+        // Texture block
         vao.bind();
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, sample_cube.position());
         ourShader.setMat4("model", model);
         vao.drawElements(36);
 
+        // Config solid color shader
         solidShader.use();
         solidShader.setMat4("projection", projection);
         solidShader.setMat4("view", view);
 
+        // Set color and draw blocks
         solidShader.setVec4("color", glm::vec4(1.0f, 0.5f, 0.2f, 1.0f));
         orange_vao.bind();
         glm::mat4 orange_model = glm::mat4(1.0f);
@@ -305,29 +320,65 @@ int main()
     return 0;
 }
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    // toggle camera mode
+    if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+        if (camera_mode == CameraMode::ThirdPerson) {
+            camera_mode = CameraMode::FirstPerson;
+            camera.followFront(player.position());
+            camera.ProcessMouseMovement(0, 0);
+        } else if (camera_mode == CameraMode::FirstPerson) {
+            camera_mode = CameraMode::ThirdPerson;
+            camera.followBehind(player.position(), player.front());
+        }
+    }
+}
+
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    }
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        // camera.ProcessKeyboard(FORWARD, deltaTime);
-        player.move(PlayerMovement::Forward, deltaTime);
-        camera.followBehind(player.position(), player.front());
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        // camera.ProcessKeyboard(BACKWARD, deltaTime);
-        player.move(PlayerMovement::Backward, deltaTime);
-        camera.followBehind(player.position(), player.front());
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        // camera.ProcessKeyboard(LEFT, deltaTime);
-        player.move(PlayerMovement::Left, deltaTime);
-        camera.followBehind(player.position(), player.front());
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        // camera.ProcessKeyboard(RIGHT, deltaTime);
-        player.move(PlayerMovement::Right, deltaTime);
-        camera.followBehind(player.position(), player.front());
+    if (camera_mode == CameraMode::ThirdPerson) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            player.move(PlayerMovement::Forward, deltaTime);
+            camera.followBehind(player.position(), player.front());
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            player.move(PlayerMovement::Backward, deltaTime);
+            camera.followBehind(player.position(), player.front());
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            player.move(PlayerMovement::Left, deltaTime);
+            camera.followBehind(player.position(), player.front());
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            player.move(PlayerMovement::Right, deltaTime);
+            camera.followBehind(player.position(), player.front());
+        }
+    } else if (camera_mode == CameraMode::FirstPerson) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            player.move(PlayerMovement::Forward, deltaTime);
+            camera.followFront(player.position());
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            player.move(PlayerMovement::Backward, deltaTime);
+            camera.followFront(player.position());
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            player.move(PlayerMovement::Left, deltaTime);
+            camera.followFront(player.position());
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            player.move(PlayerMovement::Right, deltaTime);
+            camera.followFront(player.position());
+        }
+    }
+    
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -360,7 +411,15 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    if (camera_mode == CameraMode::FirstPerson) {
+        camera.ProcessMouseMovement(xoffset, yoffset);
+        player.turn(camera.Yaw);
+    } else if (camera_mode == CameraMode::ThirdPerson) {
+        // do nothing
+        camera.ProcessMouseMovement(xoffset, 0);
+        player.turn(camera.Yaw);
+        camera.followBehind(player.position(), player.front());
+    }
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
