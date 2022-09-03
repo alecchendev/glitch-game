@@ -5,7 +5,7 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <iostream>
 
-enum PlayerMovement {
+enum class PlayerMovement {
     Forward,
     Backward,
     Left,
@@ -51,11 +51,9 @@ class Player {
         }
         if (movement == PlayerMovement::Left) {
             position_ -= right() * speed / 2.0f;
-            turn(-turn_speed_);
         }
         if (movement == PlayerMovement::Right) {
             position_ += right() * speed / 2.0f;
-            turn(turn_speed_);
         }
     }
 
@@ -63,24 +61,12 @@ class Player {
         // calculate angles
         const float pitch = 0.0f;
         yaw_ += angle;
-        // std::cout << yaw << std::endl;
-        // if (yaw <= 0.0f) {
-        //     yaw += 2 * glm::pi<float>();
-        // } else if (yaw >= 2 * glm::pi<float>()) {
-        //     yaw -= 2 * glm::pi<float>();
-        // }
-        // std::cout << yaw << std::endl;
-
         // calculate front
         glm::vec3 front;
         front.x = cos((yaw_)) * cos(glm::radians(pitch));
         front.y = sin(glm::radians(pitch));
         front.z = sin((yaw_)) * cos(glm::radians(pitch));
         front_ = glm::normalize(front);
-
-        // also re-calculate right
-        // const glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-        // right_ = glm::normalize(glm::cross(front_, up));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     }
 
   private:
