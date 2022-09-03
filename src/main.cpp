@@ -53,9 +53,11 @@ bool firstMouse = true;
 
 // create player
 Player player(
-    glm::vec3(0.0f, 0.0f, -1.0f),
-    glm::vec3(0.0f, 0.5f, 3.0f),
-    glm::vec3(0.7f, 0.7f, 0.7f)
+    glm::vec3(0.0f, 0.5f, 3.0f), // position
+    -90.0f, // yaw
+    0.0f, // pitch
+    glm::vec3(0.7f, 0.7f, 0.7f), // hurtbox_size
+    2.5f // move_speed
 );
 
 // timing
@@ -250,7 +252,7 @@ int main()
             player_vao.bind();
             glm::mat4 player_model = glm::mat4(1.0f);
             player_model = glm::translate(player_model, player_block.position());
-            player_model = glm::rotate(player_model, -player.yaw(), glm::vec3(0.0f, 1.0f, 0.0f));
+            player_model = glm::rotate(player_model, -glm::radians(player.yaw()), glm::vec3(0.0f, 1.0f, 0.0f));
             player_model = glm::translate(player_model, - 0.5f * player_block.size());
             ourShader.setMat4("model", player_model);
             vao.drawElements(36);
@@ -413,11 +415,11 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     if (camera_mode == CameraMode::FirstPerson) {
         camera.ProcessMouseMovement(xoffset, yoffset);
-        player.turn(camera.Yaw);
+        player.turnh(camera.Yaw);
     } else if (camera_mode == CameraMode::ThirdPerson) {
         // do nothing
         camera.ProcessMouseMovement(xoffset, 0);
-        player.turn(camera.Yaw);
+        player.turnh(camera.Yaw);
         camera.followBehind(player.position(), player.front());
     }
 }
