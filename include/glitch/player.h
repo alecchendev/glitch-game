@@ -5,12 +5,6 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <iostream>
 
-enum class PlayerMovement {
-    Forward,
-    Backward,
-    Left,
-    Right
-};
 
 class Player {
   public:
@@ -19,8 +13,8 @@ class Player {
     //     front_(front), position_(position), hurtbox_size_(hurtbox_size), yaw_(-glm::pi<float>() / 2)
     // {}
 
-    Player(glm::vec3 position, float yaw, float pitch, glm::vec3 hurtbox_size, float move_speed):
-        position_(position), hurtbox_size_(hurtbox_size), move_speed_(move_speed)
+    Player(glm::vec3 position, float yaw, float pitch, glm::vec3 hurtbox_size):
+        position_(position), hurtbox_size_(hurtbox_size)
     {
         turn(yaw, pitch);
     }
@@ -49,27 +43,36 @@ class Player {
         return hurtbox_size_;
     }
 
-    void move(PlayerMovement movement, float delta_time) {
-        float speed = move_speed_ * delta_time;
-        glm::vec3 move_dir = glm::vec3(0.0f);
-        if (movement == PlayerMovement::Forward) {
-            move_dir += front_;
-        }
-        if (movement == PlayerMovement::Backward) {
-            move_dir -= front_;
-        }
-        if (movement == PlayerMovement::Left) {
-            move_dir -= right();
-        }
-        if (movement == PlayerMovement::Right) {
-            move_dir += right();
-        }
-        position_ += glm::normalize(move_dir) * speed;
+    void go(glm::vec3 position) {
+        position_ = position;
     }
 
+    void move(glm::vec3 displacement) {
+        position_ += displacement;
+    }
+
+    // void move(PlayerMovement movement, float delta_time) {
+    //     float speed = move_speed_ * delta_time;
+    //     glm::vec3 move_dir = glm::vec3(0.0f);
+    //     if (movement == PlayerMovement::Forward) {
+    //         move_dir += front_;
+    //     }
+    //     if (movement == PlayerMovement::Backward) {
+    //         move_dir -= front_;
+    //     }
+    //     if (movement == PlayerMovement::Left) {
+    //         move_dir -= right();
+    //     }
+    //     if (movement == PlayerMovement::Right) {
+    //         move_dir += right();
+    //     }
+    //     position_ += glm::normalize(move_dir) * speed;
+    // }
+
     void turn(float yaw, float pitch) {
-        turnh(yaw);
-        turnv(pitch);
+        yaw_ = yaw;
+        pitch_ = pitch;
+        updateDirection();
     }
 
     void turnh(float yaw) {
@@ -91,8 +94,6 @@ class Player {
     glm::vec3 right_;
 
     glm::vec3 hurtbox_size_;
-
-    const float move_speed_;
 
     void updateDirection() {
         // front

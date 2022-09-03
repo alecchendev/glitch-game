@@ -67,6 +67,28 @@ public:
         return glm::lookAt(Position, Position + Front, Up);
     }
 
+    void go(glm::vec3 position) {
+        Position = position;
+    }
+
+    void turn(float yaw, float pitch) {
+        Yaw = yaw;
+        Pitch = pitch;
+        updateCameraVectors();
+    }
+
+    void turnh(float yaw) {
+        Yaw = yaw;
+        updateCameraVectors();
+    }
+
+    void turnv(float pitch) {
+        Pitch = pitch;
+        updateCameraVectors();
+    }
+
+    //----------
+
     void followFront(glm::vec3 position) {
         Position = position;
     }
@@ -120,16 +142,6 @@ public:
 
         // update Front, Right and Up Vectors using the updated Euler angles
         updateCameraVectors();
-    }
-
-    // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-    void ProcessMouseScroll(float yoffset)
-    {
-        Zoom -= (float)yoffset;
-        if (Zoom < 1.0f)
-            Zoom = 1.0f;
-        if (Zoom > 45.0f)
-            Zoom = 45.0f; 
     }
 
 private:
