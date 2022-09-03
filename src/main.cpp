@@ -17,11 +17,30 @@
 #include <vector>
 #include <algorithm>
 
+// window input callbacks
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow *window);
+
+// player movement
+enum class PlayerMovement {
+    Forward,
+    ForwardLeft,
+    ForwardRight,
+    Back,
+    BackLeft,
+    BackRight,
+    Left,
+    Right
+};
+
+// game logic from inputs
+void toggleCameraMode();
+void movePlayer(PlayerMovement move);
+void turnPlayer(float xoffset, float yoffset, bool constrain_pitch = true);
+void updateCamera();
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -47,24 +66,14 @@ CameraMode camera_mode = CameraMode::ThirdPerson;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.5f, 3.0f));
+const float third_person_pitch = -30.0f;
+const glm::vec3 third_person_displacement = glm::vec3(-4.0f, 2.0f, 0.0f);
 
 // mouse
 float mouse_sensitivity = 0.1f;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
-
-// player movement
-enum class PlayerMovement {
-    Forward,
-    ForwardLeft,
-    ForwardRight,
-    Back,
-    BackLeft,
-    BackRight,
-    Left,
-    Right
-};
 
 // create player
 Player player(
@@ -340,69 +349,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     // toggle camera mode
     if (key == GLFW_KEY_C && action == GLFW_PRESS) {
-        if (camera_mode == CameraMode::ThirdPerson) {
-            camera_mode = CameraMode::FirstPerson;
-            camera.followFront(player.position());
-            camera.ProcessMouseMovement(0, 0);
-        } else if (camera_mode == CameraMode::FirstPerson) {
-            camera_mode = CameraMode::ThirdPerson;
-            camera.followBehind(player.position(), player.front());
-        }
+        toggleCameraMode();
+        updateCamera();
     }
-}
-
-void movePlayer(PlayerMovement move) {
-
-    float speed = player_move_speed * delta_time;
-
-    glm::vec3 move_dir = glm::vec3(0.0f);
-    if (move == PlayerMovement::Forward) move_dir = player.front();
-    else if (move == PlayerMovement::ForwardLeft) move_dir = player.front() - player.right();
-    else if (move == PlayerMovement::ForwardRight) move_dir = player.front() + player.right();
-    else if (move == PlayerMovement::Back) move_dir = -player.front();
-    else if (move == PlayerMovement::BackLeft) move_dir = -player.front() - player.right();
-    else if (move == PlayerMovement::BackRight) move_dir = -player.front() + player.right();
-    else if (move == PlayerMovement::Left) move_dir = - player.right();
-    else if (move == PlayerMovement::Right) move_dir = player.right();
-
-    player.move(glm::normalize(move_dir) * speed);
-}
-
-void turnPlayer(float xoffset, float yoffset, bool constrain_pitch = true) {
-    xoffset *= mouse_sensitivity;
-    yoffset *= mouse_sensitivity;
-
-    float yaw   = player.yaw() + xoffset;
-    float pitch = player.pitch() + yoffset;
-
-    // make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (constrain_pitch)
-    {
-        if (pitch > 89.0f) pitch = 89.0f;
-        if (pitch < -89.0f) pitch = -89.0f;
-    }
-
-    // Execute turn
-    if (camera_mode == CameraMode::FirstPerson) {
-        player.turn(yaw, pitch);
-    } else if (camera_mode == CameraMode::ThirdPerson) {
-        player.turnh(yaw);
-    }
-}
-
-void updateCamera() {
-
-    // move position + update camera
-    if (camera_mode == CameraMode::FirstPerson) {
-
-    } else if (camera_mode == CameraMode::ThirdPerson) {
-        // fix hard coding front and pitch
-        glm::vec3 front = player.front() + glm::vec3(0.0f, -0.5f, 0.0f);
-        camera.go(player.position() - 5.0f * front);
-        float pitch = player.pitch() - 30.0f;
-        camera.turn(player.yaw(), pitch);
-    }
-
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -433,73 +382,6 @@ void processInput(GLFWwindow *window)
 
     // update camera to follow player
     updateCamera();
-
-    // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    //     movePlayer(PlayerMovement::ForwardLeft);
-    //     updateCamera();
-    // }
-    // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    //     movePlayer(PlayerMovement::ForwardRight);
-    //     updateCamera();
-    // }
-    // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    //     PlayerMovement movement = PlayerMovement::Forward;
-    //     bool left = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-    //     bool right = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
-    //     if (left && !right) movement = PlayerMovement::ForwardLeft;
-    //     if (right && !left) movement = PlayerMovement::ForwardRight;
-    //     movePlayer(movement);
-    //     updateCamera();
-    // }
-    // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    //     movePlayer(PlayerMovement::Backward);
-    //     updateCamera();
-    // }
-    // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    //     movePlayer(PlayerMovement::Left);
-    //     updateCamera();
-    // }
-    // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    //     movePlayer(PlayerMovement::Right);
-    //     updateCamera();
-    // }
-
-    // if (camera_mode == CameraMode::ThirdPerson) {
-    //     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    //         player.move(PlayerMovement::Forward, deltaTime);
-    //         camera.followBehind(player.position(), player.front());
-    //     }
-    //     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    //         player.move(PlayerMovement::Backward, deltaTime);
-    //         camera.followBehind(player.position(), player.front());
-    //     }
-    //     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    //         player.move(PlayerMovement::Left, deltaTime);
-    //         camera.followBehind(player.position(), player.front());
-    //     }
-    //     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    //         player.move(PlayerMovement::Right, deltaTime);
-    //         camera.followBehind(player.position(), player.front());
-    //     }
-    // } else if (camera_mode == CameraMode::FirstPerson) {
-    //     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    //         player.move(PlayerMovement::Forward, deltaTime);
-    //         camera.followFront(player.position());
-    //     }
-    //     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    //         player.move(PlayerMovement::Backward, deltaTime);
-    //         camera.followFront(player.position());
-    //     }
-    //     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    //         player.move(PlayerMovement::Left, deltaTime);
-    //         camera.followFront(player.position());
-    //     }
-    //     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    //         player.move(PlayerMovement::Right, deltaTime);
-    //         camera.followFront(player.position());
-    //     }
-    // }
-    
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -534,14 +416,68 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     turnPlayer(xoffset, yoffset);
     updateCamera();
+}
 
-    // if (camera_mode == CameraMode::FirstPerson) {
-    //     camera.ProcessMouseMovement(xoffset, yoffset);
-    //     player.turnh(camera.Yaw);
-    // } else if (camera_mode == CameraMode::ThirdPerson) {
-    //     // do nothing
-    //     camera.ProcessMouseMovement(xoffset, 0);
-    //     player.turnh(camera.Yaw);
-    //     camera.followBehind(player.position(), player.front());
-    // }
+void toggleCameraMode() {
+    if (camera_mode == CameraMode::ThirdPerson) {
+        camera_mode = CameraMode::FirstPerson;
+    } else if (camera_mode == CameraMode::FirstPerson) {
+        camera_mode = CameraMode::ThirdPerson;
+    }
+}
+
+void movePlayer(PlayerMovement move) {
+
+    float speed = player_move_speed * delta_time;
+
+    glm::vec3 move_dir = glm::vec3(0.0f);
+    if (move == PlayerMovement::Forward) move_dir = player.front();
+    else if (move == PlayerMovement::ForwardLeft) move_dir = player.front() - player.right();
+    else if (move == PlayerMovement::ForwardRight) move_dir = player.front() + player.right();
+    else if (move == PlayerMovement::Back) move_dir = -player.front();
+    else if (move == PlayerMovement::BackLeft) move_dir = -player.front() - player.right();
+    else if (move == PlayerMovement::BackRight) move_dir = -player.front() + player.right();
+    else if (move == PlayerMovement::Left) move_dir = - player.right();
+    else if (move == PlayerMovement::Right) move_dir = player.right();
+
+    // project to xz plane
+    move_dir.y = 0.0f;
+    player.move(glm::normalize(move_dir) * speed);
+}
+
+void turnPlayer(float xoffset, float yoffset, bool constrain_pitch) {
+    xoffset *= mouse_sensitivity;
+    yoffset *= mouse_sensitivity;
+
+    float yaw   = player.yaw() + xoffset;
+    float pitch = player.pitch() + yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (constrain_pitch)
+    {
+        if (pitch > 89.0f) pitch = 89.0f;
+        if (pitch < -89.0f) pitch = -89.0f;
+    }
+
+    // Execute turn
+    if (camera_mode == CameraMode::FirstPerson) {
+        player.turn(yaw, pitch);
+    } else if (camera_mode == CameraMode::ThirdPerson) {
+        player.turnh(yaw);
+    }
+}
+
+void updateCamera() {
+
+    // move position + update camera
+    if (camera_mode == CameraMode::FirstPerson) {
+        camera.turn(player.yaw(), player.pitch());
+        camera.go(player.position());
+    } else if (camera_mode == CameraMode::ThirdPerson) {
+        camera.turn(player.yaw(), third_person_pitch);
+        glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), -glm::radians(player.yaw()), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::vec3 rotated = glm::vec3(rotate * glm::vec4(third_person_displacement, 0.0f));
+        camera.go(player.position() + rotated);
+    }
+
 }
