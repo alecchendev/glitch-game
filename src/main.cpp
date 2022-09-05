@@ -17,14 +17,11 @@
 #include <vector>
 #include <algorithm>
 
-// window input callbacks
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void processInput(GLFWwindow *window);
-
-// player movement
+// define types
+enum class CameraMode {
+    FirstPerson,
+    ThirdPerson
+};
 enum class PlayerMovement {
     Forward,
     ForwardLeft,
@@ -36,13 +33,22 @@ enum class PlayerMovement {
     Right
 };
 
+// define function signatures
+// window input callbacks
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void processInput(GLFWwindow *window);
+
 // game logic from inputs
 void toggleCameraMode();
 void movePlayer(PlayerMovement move);
 void turnPlayer(float xoffset, float yoffset, bool constrain_pitch = true);
 void updateCamera();
 
-// settings
+// config game context
+// basic window settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 const char* WINDOW_TITLE = "Glitch Game";
@@ -57,20 +63,14 @@ const std::string FRAGMENT_SHADER_TEXTURE_PATH = "src/shaders/fragment.glsl";
 const std::string AWESOMEFACE_IMAGE_PATH = "src/images/awesomeface.png";
 const std::string CONTAINER_IMAGE_PATH = "src/images/container.jpg";
 
-// camera mode
-enum class CameraMode {
-    FirstPerson,
-    ThirdPerson
-};
-CameraMode camera_mode = CameraMode::ThirdPerson;
-
 // camera
 Camera camera(glm::vec3(0.0f, 0.5f, 3.0f));
 const float third_person_pitch = -30.0f;
 const glm::vec3 third_person_displacement = glm::vec3(-4.0f, 2.0f, 0.0f);
+CameraMode camera_mode = CameraMode::ThirdPerson;
 
 // mouse
-float mouse_sensitivity = 0.1f;
+const float mouse_sensitivity = 0.1f;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -201,8 +201,9 @@ int main()
     blue_vao.initFromBlock(blue_block);
 
     // // add blocks to vector to render
-    // std::vector<gfx::VAO&> world_objects;
+    // std::vector<gfx::VAO*> world_objects;
     // world_objects.push_back(orange_vao);
+    std::vector<
 
     // load and create a texture 
     // -------------------------
