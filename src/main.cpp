@@ -203,6 +203,7 @@ int main()
     // // add blocks to vector to render
     // std::vector<gfx::VAO*> world_objects;
     // world_objects.push_back(orange_vao);
+    std::vector<
 
     // load and create a texture 
     // -------------------------
