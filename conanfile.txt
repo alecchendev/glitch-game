@@ -3,6 +3,7 @@ glfw/3.3.7
 glad/0.1.36
 glm/0.9.9.8
 stb/cci.20210910
+bullet3/3.24
 
 [generators]
 cmake

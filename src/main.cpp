@@ -8,6 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <btBulletDynamicsCommon.h>
+
 #include <glitch/shader.h>
 #include <glitch/camera.h>
 #include <glitch/graphics.h>
